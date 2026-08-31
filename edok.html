@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Soundscape Profile Test</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    :root {
+      --bg-color: #b754a8;
+      --card-bg: #dc99b4;
+      --accent-color: #6366f1;
+      --accent-hover: #3379e1;
+      --text-main: #f8fafc;
+      --text-muted: #124e6c;
+    }
+
+    body {
+      /* ตั้งค่าฟอนต์น่ารักเป็นหลัก */
+      font-family: 'Mali', cursive, sans-serif;
+      background-image: url('bgsakura.jpg'); 
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(91, 7, 31, 0.5);
+      text-align: center;
+      transition: background-color 0.3s ease;
+      position: relative;
+    }
+
+    .container.sleep-mode {
+      background-color: #060436 !important;
+    }
+
+    h1, h2 { 
+      font-family: 'Mali', cursive, sans-serif;
+      font-weight: 700;
+      margin-bottom: 16px; 
+    }
+    p { color: var(--text-muted); line-height: 1.6; }
+
+    button, textarea {
+      font-family: 'Mali', cursive, sans-serif;
+    }
+
+    .btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 20px;
+    }
+    .btn:hover { 
+      background-color: var(--accent-hover); 
+      transform: scale(1.03);
+    }
+
+    .btn-audio {
+      background-color: #3e1271;
+      margin-top: 15px;
+      padding: 8px 18px;
+      font-size: 14px;
+    }
+
+    .hidden { display: none !important; }
+
+    .timer {
+      font-size: 36px;
+      font-weight: bold;
+      color: #c90d4f;
+      margin: 20px 0;
+    }
+
+    .timer-sleep {
+      color: #DDE310 !important;
+    }
+
+    .word-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    /* กล่องตัวเลขจดจำ: ใช้ฟอนต์เดิมตามที่ต้องการ */
+    .word-chip {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      background-color: #51091d;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      background: #334155;
+      border: 1px solid #475569;
+      color: white;
+      border-radius: 12px;
+      padding: 12px;
+      box-sizing: border-box;
+      resize: none;
+      font-size: 18px;
+    }
+
+    .sound-badge {
+      display: inline-block;
+      background: #a3053a;
+      padding: 6px 16px;
+      border-radius: 12px;
+      font-size: 15px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .progress-text {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .result-table th, .result-table td {
+      border: 1px solid #475569;
+      padding: 10px;
+      text-align: left;
+    }
+    .result-table th { background-color: #334155; }
+
+    /* สไตล์รูปหมาเต้นดุ๊กดิ๊ก */
+    .dancing-dog {
+      width: 130px;
+      height: auto;
+      margin: 15px auto 5px auto;
+      display: block;
+      animation: bounce-dance 0.6s infinite alternate ease-in-out;
+    }
+
+    @keyframes bounce-dance {
+      0% {
+        transform: translateY(0) rotate(-4deg) scale(1);
+      }
+      100% {
+        transform: translateY(-12px) rotate(4deg) scale(1.04);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="main-container">
+    <div id="screen-intro">
+      <h1>Personal Soundscape Test</h1>
+      <p>ค้นหาสภาวะเสียงที่เหมาะกับการจดจำข้อมูลของคุณมากที่สุด ผ่านการทดสอบ 7 สภาวะเสียง</p>
+      <button class="btn" onclick="startTest()">เริ่มการทดสอบ</button>
+    </div>
+
+    <div id="screen-memo" class="hidden">
+      <div id="progress-indicator" class="progress-text">สภาวะเสียงที่ 1 / 7</div>
+      <div id="sound-indicator" class="sound-badge">Sound: Loading...</div>
+      <h2>ช่วงเวลาจดจำ (Memorize)</h2>
+      <p>จดจำชุดตัวเลข 2 หลักเหล่านี้ให้ได้มากที่สุดภายในเวลาที่กำหนด</p>
+      <div class="timer" id="memo-timer">20</div>
+      <div class="word-list" id="word-container"></div>
+    </div>
+
+    <div id="screen-distract" class="hidden">
+      <h2>จำลองการนอนหลับ</h2>
+      <p style="color: #f8fafc;">จำลองสถานการณ์การนอนหลับหลังจากจดจำข้อมูล</p>
+      <div class="timer timer-sleep" id="distract-timer">7</div>
+    </div>
+
+    <div id="screen-recall" class="hidden">
+      <h2>ช่วงดึงความจำ (Recall)</h2>
+      <p>พิมพ์ตัวเลขที่คุณจำได้ โดยเว้นวรรคระหว่างตัวเลข</p>
+      <div class="timer" id="recall-timer">30</div>
+      <textarea id="user-input" placeholder="พิมพ์คำตอบที่นี่ เช่น: 15 42 89" onkeydown="handleKeyDown(event)"></textarea><br>
+      <button class="btn" onclick="submitRecall()">ส่งคำตอบก่อนหมดเวลา</button>
+    </div>
+
+    <div id="screen-result" class="hidden">
+      <h1>ผลลัพธ์ของคุณ</h1>
+      <h2 id="archetype-title" style="color: #461389;">-</h2>
+      <p id="archetype-desc">-</p>
+
+      <img id="result-dog-gif" src="" alt="Dancing Dog" class="dancing-dog">
+      
+      <button id="toggle-audio-btn" class="btn btn-audio" onclick="toggleResultAudio()">🔊 ปิดเสียงเพลง</button>
+
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>สภาวะเสียง</th>
+            <th>คะแนนที่ได้</th>
+          </tr>
+        </thead>
+        <tbody id="result-rows"></tbody>
+      </table>
+      <button class="btn" onclick="location.reload()">ทดสอบอีกครั้ง</button>
+    </div>
+  </div>
+
+  <script>
+    let generatedNumbers = [];
+
+    // รายการ GIF หมาเต้นสำหรับสุ่ม
+    const dogGifs = [
+      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGFiM3BocTlyYm94NWd2ZTRqZWM5MWVvbzN2andhb3FsYjg2eDZrZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/07pkM0G0p6PhkvSb3U/giphy.gif",
+      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGFiM3BocTlyYm94NWd2ZTRqZWM5MWVvbzN2andhb3FsYjg2eDZrZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lsPxvZZHb7h1Y01oeA/giphy.gif",
+      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGFiM3BocTlyYm94NWd2ZTRqZWM5MWVvbzN2andhb3FsYjg2eDZrZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/j8mL8Qq0aRbvKH9OSq/giphy.gif"
+    ];
+
+    function generateRandomNumbers(count = 8) {
+      const numbers = new Set();
+      while (numbers.size < count) {
+        const randomNum = Math.floor(Math.random() * 90) + 10;
+        numbers.add(randomNum.toString());
+      }
+      return Array.from(numbers);
+    }
+
+    const soundConditions = [
+      { id: "silence", name: "Silence (ความเงียบ)", type: "The Silent Analyst", audioSrc: null },
+      { id: "whitenoise", name: "White Noise (เสียงธรรมชาติ)", type: "The Rhythm Focused", audioSrc: "white voice.mp3" },
+      { id: "classical", name: "Classical Music", type: "The Melodic Thinker", audioSrc: "acustic2.mp3" },
+      { id: "pop", name: "Pop Music", type: "The High-Arousal Learner", audioSrc: "pop2.mp3" },
+      { id: "rnb", name: "R&B Music", type: "The Smooth Groove Learner", audioSrc: "RnB.mp3" },
+      { id: "jazz", name: "Jazz Music", type: "The Creative Flow Mind", audioSrc: "jazz.mp3" },
+      { id: "rock", name: "Rock Music", type: "The Energetic Processing Mind", audioSrc: "rock.mp3" }
+    ];
+
+    let currentRound = 0;
+    let testSequence = []; 
+    let scores = {};
+    let timerInterval;
+    let currentAudio = new Audio();
+    let isPlayingResultAudio = false;
+
+    const TIME_MEMO = 20;
+    const TIME_DISTRACT = 7;
+    const TIME_RECALL = 30;
+
+    function stopAudio() {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+    }
+
+    function startTest() {
+      generatedNumbers = Array.from({ length: soundConditions.length }, () => generateRandomNumbers(8));
+      testSequence = [...soundConditions].sort(() => Math.random() - 0.5);
+      currentRound = 0;
+      scores = {};
+      nextRound();
+    }
+
+    function nextRound() {
+      if (currentRound >= testSequence.length) {
+        showResults();
+        return;
+      }
+      showMemorizeStage();
+    }
+
+    function showMemorizeStage() {
+      switchScreen('screen-memo');
+      const condition = testSequence[currentRound];
+      
+      document.getElementById('progress-indicator').innerText = `สภาวะเสียงที่ ${currentRound + 1} / ${testSequence.length}`;
+      document.getElementById('sound-indicator').innerText = `สภาวะเสียง: ${condition.name}`;
+
+      stopAudio();
+
+      if (condition.audioSrc) {
+        currentAudio.src = condition.audioSrc;
+        currentAudio.loop = true;
+        currentAudio.load();
+        
+        let playPromise = currentAudio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(err => {
+            console.warn("Audio error:", err);
+          });
+        }
+      }
+
+      const currentNumbers = generatedNumbers[currentRound];
+      const container = document.getElementById('word-container');
+      container.innerHTML = currentNumbers.map(n => `<span class="word-chip">${n}</span>`).join('');
+
+      runTimer(TIME_MEMO, 'memo-timer', showDistractionStage);
+    }
+
+    function showDistractionStage() {
+      stopAudio();
+      switchScreen('screen-distract');
+      runTimer(TIME_DISTRACT, 'distract-timer', showRecallStage);
+    }
+
+    function showRecallStage() {
+      switchScreen('screen-recall');
+      document.getElementById('user-input').value = '';
+      document.getElementById('user-input').focus();
+      runTimer(TIME_RECALL, 'recall-timer', submitRecall);
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        submitRecall();
+      }
+    }
+
+    function submitRecall() {
+      clearInterval(timerInterval);
+      stopAudio();
+      
+      const input = document.getElementById('user-input').value.trim();
+      const userAnswers = input.split(/\s+/).filter(Boolean);
+      const correctNumbers = generatedNumbers[currentRound];
+      
+      let score = 0;
+      userAnswers.forEach(ans => {
+        if (correctNumbers.includes(ans)) score++;
+      });
+
+      const currentCondition = testSequence[currentRound];
+      scores[currentCondition.id] = {
+        name: currentCondition.name,
+        score: score,
+        max: correctNumbers.length,
+        type: currentCondition.type,
+        audioSrc: currentCondition.audioSrc
+      };
+
+      currentRound++;
+      nextRound();
+    }
+
+    function showResults() {
+      stopAudio();
+      switchScreen('screen-result');
+      
+      const randomGif = dogGifs[Math.floor(Math.random() * dogGifs.length)];
+      document.getElementById('result-dog-gif').src = randomGif;
+
+      const tbody = document.getElementById('result-rows');
+      tbody.innerHTML = '';
+
+      let maxScore = -1;
+      const scoreItems = Object.values(scores);
+
+      scoreItems.forEach(item => {
+        if (item.score > maxScore) {
+          maxScore = item.score;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${item.name}</td><td>${item.score} / ${item.max} ตัว</td>`;
+        tbody.appendChild(tr);
+      });
+
+      let selectedCondition = null;
+
+      if (maxScore === 0) {
+        document.getElementById('archetype-title').innerText = "สมาธิอาจจะยังไม่พร้อม";
+        document.getElementById('archetype-desc').innerText = "ตอนนี้ดูเหมือนว่าคุณจะไม่ค่อยมีสมาธิเลยไว้ลองใหม่อีกทีนะ!";
+        
+        const availableAudioConditions = soundConditions.filter(c => c.audioSrc !== null);
+        selectedCondition = availableAudioConditions[Math.floor(Math.random() * availableAudioConditions.length)];
+      } 
+      else {
+        const topConditions = scoreItems.filter(item => item.score === maxScore);
+        selectedCondition = topConditions[Math.floor(Math.random() * topConditions.length)];
+
+        document.getElementById('archetype-title').innerText = selectedCondition.type;
+        
+        const descriptions = {
+          "The Silent Analyst": "คุณทำงานได้ดีที่สุดในความเงียบ สมองใช้พลังงานทั้งหมดไปกับการประมวลผลโดยไม่มีสิ่งกระตุ้นรบกวน",
+          "The Rhythm Focused": "คุณเหมาะกับเสียง Background เสียงธรรมชาติ หรือ White noise ที่ช่วยบดบังเสียงรบกวนรอบข้าง",
+          "The Melodic Thinker": "ดนตรีไร้เนื้อร้อง เช่น Classical หรือ Lofi ช่วยปรับคลื่นสมองให้คุณโฟกัสได้ดีที่สุด",
+          "The High-Arousal Learner": "คุณต้องการเสียงเพลงที่มีจังหวะหรือมีเนื้อร้องเพื่อกระตุ้นระดับความตื่นตัวของสมองในการจำ",
+          "The Smooth Groove Learner": "จังหวะเพลง R&B ที่มีบีตนุ่มนวลและต่อเนื่อง ช่วยสร้างบรรยากาศผ่อนคลาย ทำให้สมองมีสมาธิจดจำข้อมูลได้ดียิ่งขึ้น",
+          "The Creative Flow Mind": "เพลง Jazz ช่วยให้สมองเข้าสู่สภาวะความคิดสร้างสรรค์และลื่นไหล ช่วยสร้างบรรยากาศการเรียนรู้ที่ผ่อนคลายแต่มีสมาธิ",
+          "The Energetic Processing Mind": "เพลง Rock ที่มีความหนักแน่นช่วยกระตุ้นระดับอะดรีนาลีน ทำให้สมองของคุณประมวลผลข้อมูลได้ดีในสภาวะที่มีพลังงานสูง"
+        };
+        
+        document.getElementById('archetype-desc').innerText = descriptions[selectedCondition.type] || "";
+      }
+
+      const toggleBtn = document.getElementById('toggle-audio-btn');
+      if (selectedCondition && selectedCondition.audioSrc) {
+        currentAudio.src = selectedCondition.audioSrc;
+        currentAudio.loop = true;
+        currentAudio.load();
+        
+        let playPromise = currentAudio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            isPlayingResultAudio = true;
+            toggleBtn.style.display = 'inline-block';
+            toggleBtn.innerText = '🔊 ปิดเสียงเพลง';
+          }).catch(err => {
+            console.warn("Audio error:", err);
+            toggleBtn.style.display = 'none';
+          });
+        }
+      } else {
+        toggleBtn.style.display = 'none';
+      }
+
+      triggerConfetti();
+    }
+
+    function toggleResultAudio() {
+      const toggleBtn = document.getElementById('toggle-audio-btn');
+      if (isPlayingResultAudio) {
+        currentAudio.pause();
+        isPlayingResultAudio = false;
+        toggleBtn.innerText = '🔇 เปิดเสียงเพลง';
+      } else {
+        currentAudio.play();
+        isPlayingResultAudio = true;
+        toggleBtn.innerText = '🔊 ปิดเสียงเพลง';
+      }
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+        setTimeout(() => {
+          confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0 } });
+          confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1 } });
+        }, 250);
+      }
+    }
+
+    function runTimer(seconds, elementId, onComplete) {
+      let timeLeft = seconds;
+      document.getElementById(elementId).innerText = timeLeft;
+      
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById(elementId).innerText = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          onComplete();
+        }
+      }, 1000);
+    }
+
+    function switchScreen(screenId) {
+      const screens = ['screen-intro', 'screen-memo', 'screen-distract', 'screen-recall', 'screen-result'];
+      screens.forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(screenId).classList.remove('hidden');
+
+      const container = document.getElementById('main-container');
+      if (screenId === 'screen-distract') {
+        container.classList.add('sleep-mode');
+      } else {
+        container.classList.remove('sleep-mode');
+      }
+    }
+  </script>
+</body>
+</html>
